@@ -1,0 +1,35 @@
+<idea-plugin version="2">
+    <id>br.com.phoebus.wmls.editor</id>
+    <name>Wmls Language Editor</name>
+    <version>1.0</version>
+    <vendor email="rauny.souza@phoebustecnologia.com.br" url="http://www.phoebus.com.br">Phoebus Tecnologia</vendor>
+
+    <description><![CDATA[
+      Plugin used in development of applications using WMLS Language
+    ]]></description>
+
+    <change-notes><![CDATA[
+
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="141.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="br.com.phoebus.wmls.editor.WmlsFileTypeFactory"/>
+        <lang.parserDefinition language="WMLS" implementationClass="br.com.phoebus.wmls.editor.parser.WmlsParserDefinition"/>
+        <lang.syntaxHighlighterFactory key="WMLS" implementationClass="br.com.phoebus.wmls.editor.WmlsSyntaxHighlighterFactory"/>
+    </extensions>
+
+    <actions>
+
+    </actions>
+
+</idea-plugin>
