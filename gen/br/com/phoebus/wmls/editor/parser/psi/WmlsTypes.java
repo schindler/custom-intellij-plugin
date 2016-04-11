@@ -16,19 +16,24 @@ public interface WmlsTypes {
   IElementType FUNCTION_DECLARATION = new WmlsElementType("FUNCTION_DECLARATION");
   IElementType FUNCTION_NAME = new WmlsElementType("FUNCTION_NAME");
   IElementType LOCAL_FUNCTION_CALL = new WmlsElementType("LOCAL_FUNCTION_CALL");
+  IElementType PACKAGE_STATEMENT = new WmlsElementType("PACKAGE_STATEMENT");
+  IElementType PRAGMA_DECLARATION = new WmlsElementType("PRAGMA_DECLARATION");
 
   IElementType BITSHIFT_LEFT = new WmlsTokenType("<<");
   IElementType BITSHIFT_RIGHT = new WmlsTokenType(">>");
   IElementType BLOCK_COMMENT = new WmlsTokenType("BLOCK_COMMENT");
   IElementType COMMA = new WmlsTokenType(",");
+  IElementType CRLF = new WmlsTokenType("CRLF");
   IElementType DOC_COMMENT = new WmlsTokenType("DOC_COMMENT");
+  IElementType EXTERN = new WmlsTokenType("extern");
+  IElementType FUNCTION = new WmlsTokenType("function");
   IElementType HEX = new WmlsTokenType("HEX");
-  IElementType ID = new WmlsTokenType("ID");
   IElementType IDENTIFIER = new WmlsTokenType("identifier");
   IElementType LEFT_BRACE = new WmlsTokenType("{");
   IElementType LEFT_BRACKET = new WmlsTokenType("[");
   IElementType LEFT_PAREN = new WmlsTokenType("(");
   IElementType LINE_COMMENT = new WmlsTokenType("LINE_COMMENT");
+  IElementType NATIVE = new WmlsTokenType("native");
   IElementType NUMBER = new WmlsTokenType("NUMBER");
   IElementType OP_ADD = new WmlsTokenType("+");
   IElementType OP_ADD_ASSIGN = new WmlsTokenType("+=");
@@ -65,11 +70,15 @@ public interface WmlsTypes {
   IElementType OP_OR = new WmlsTokenType("||");
   IElementType OP_SUBTRACT = new WmlsTokenType("-");
   IElementType OP_SUB_ASSIGN = new WmlsTokenType("-=");
+  IElementType PACKAGE = new WmlsTokenType("package");
+  IElementType PACKAGE_IDENTIFIER = new WmlsTokenType("PACKAGE_IDENTIFIER");
   IElementType RIGHT_BRACE = new WmlsTokenType("}");
   IElementType RIGHT_BRACKET = new WmlsTokenType("]");
   IElementType RIGHT_PAREN = new WmlsTokenType(")");
   IElementType SEMICOLON = new WmlsTokenType(";");
   IElementType STRING = new WmlsTokenType("STRING");
+  IElementType URL = new WmlsTokenType("url");
+  IElementType USE = new WmlsTokenType("use");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
@@ -97,6 +106,12 @@ public interface WmlsTypes {
       }
       else if (type == LOCAL_FUNCTION_CALL) {
         return new WmlsLocalFunctionCallImpl(node);
+      }
+      else if (type == PACKAGE_STATEMENT) {
+        return new WmlsPackageStatementImpl(node);
+      }
+      else if (type == PRAGMA_DECLARATION) {
+        return new WmlsPragmaDeclarationImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

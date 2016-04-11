@@ -47,6 +47,12 @@ public class WmlsParser implements PsiParser, LightPsiParser {
     else if (t == LOCAL_FUNCTION_CALL) {
       r = localFunctionCall(b, 0);
     }
+    else if (t == PACKAGE_STATEMENT) {
+      r = packageStatement(b, 0);
+    }
+    else if (t == PRAGMA_DECLARATION) {
+      r = pragmaDeclaration(b, 0);
+    }
     else {
       r = parse_root_(t, b, 0);
     }
@@ -83,7 +89,7 @@ public class WmlsParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LEFT_PAREN (argumentList)? RIGHT_PAREN
+  // LEFT_PAREN argumentList? RIGHT_PAREN
   public static boolean arguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arguments")) return false;
     if (!nextTokenIs(b, LEFT_PAREN)) return false;
@@ -96,21 +102,11 @@ public class WmlsParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (argumentList)?
+  // argumentList?
   private static boolean arguments_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arguments_1")) return false;
-    arguments_1_0(b, l + 1);
+    argumentList(b, l + 1);
     return true;
-  }
-
-  // (argumentList)
-  private static boolean arguments_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "arguments_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = argumentList(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -126,33 +122,58 @@ public class WmlsParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LEFT_BRACE RIGHT_BRACE
+  // LEFT_BRACE (localFunctionCall)? RIGHT_BRACE
   public static boolean block(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "block")) return false;
     if (!nextTokenIs(b, LEFT_BRACE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, LEFT_BRACE, RIGHT_BRACE);
+    r = consumeToken(b, LEFT_BRACE);
+    r = r && block_1(b, l + 1);
+    r = r && consumeToken(b, RIGHT_BRACE);
     exit_section_(b, m, BLOCK, r);
     return r;
   }
 
-  /* ********************************************************** */
-  // IDENTIFIER | formalParameterList COMMA IDENTIFIER
-  public static boolean formalParameterList(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "formalParameterList")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+  // (localFunctionCall)?
+  private static boolean block_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "block_1")) return false;
+    block_1_0(b, l + 1);
+    return true;
+  }
+
+  // (localFunctionCall)
+  private static boolean block_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "block_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
-    if (!r) r = formalParameterList_1(b, l + 1);
-    exit_section_(b, m, FORMAL_PARAMETER_LIST, r);
+    r = localFunctionCall(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
-  // formalParameterList COMMA IDENTIFIER
+  /* ********************************************************** */
+  // IDENTIFIER | (formalParameterList COMMA IDENTIFIER)?
+  public static boolean formalParameterList(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "formalParameterList")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _COLLAPSE_, FORMAL_PARAMETER_LIST, "<formal parameter list>");
+    r = consumeToken(b, IDENTIFIER);
+    if (!r) r = formalParameterList_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // (formalParameterList COMMA IDENTIFIER)?
   private static boolean formalParameterList_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "formalParameterList_1")) return false;
+    formalParameterList_1_0(b, l + 1);
+    return true;
+  }
+
+  // formalParameterList COMMA IDENTIFIER
+  private static boolean formalParameterList_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "formalParameterList_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = formalParameterList(b, l + 1);
@@ -162,53 +183,59 @@ public class WmlsParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ('extern' | 'native')? 'function' identifier LEFT_PAREN (formalParameterList)? RIGHT_PAREN block (SEMICOLON)?
+  // (extern | native)? function identifier LEFT_PAREN formalParameterList? RIGHT_PAREN (block)? (SEMICOLON)?
   public static boolean functionDeclaration(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "functionDeclaration")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, FUNCTION_DECLARATION, "<function declaration>");
     r = functionDeclaration_0(b, l + 1);
-    r = r && consumeToken(b, "function");
-    r = r && consumeTokens(b, 0, IDENTIFIER, LEFT_PAREN);
+    r = r && consumeTokens(b, 0, FUNCTION, IDENTIFIER, LEFT_PAREN);
     r = r && functionDeclaration_4(b, l + 1);
     r = r && consumeToken(b, RIGHT_PAREN);
-    r = r && block(b, l + 1);
+    r = r && functionDeclaration_6(b, l + 1);
     r = r && functionDeclaration_7(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // ('extern' | 'native')?
+  // (extern | native)?
   private static boolean functionDeclaration_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "functionDeclaration_0")) return false;
     functionDeclaration_0_0(b, l + 1);
     return true;
   }
 
-  // 'extern' | 'native'
+  // extern | native
   private static boolean functionDeclaration_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "functionDeclaration_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, "extern");
-    if (!r) r = consumeToken(b, "native");
+    r = consumeToken(b, EXTERN);
+    if (!r) r = consumeToken(b, NATIVE);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // (formalParameterList)?
+  // formalParameterList?
   private static boolean functionDeclaration_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "functionDeclaration_4")) return false;
-    functionDeclaration_4_0(b, l + 1);
+    formalParameterList(b, l + 1);
     return true;
   }
 
-  // (formalParameterList)
-  private static boolean functionDeclaration_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "functionDeclaration_4_0")) return false;
+  // (block)?
+  private static boolean functionDeclaration_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "functionDeclaration_6")) return false;
+    functionDeclaration_6_0(b, l + 1);
+    return true;
+  }
+
+  // (block)
+  private static boolean functionDeclaration_6_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "functionDeclaration_6_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = formalParameterList(b, l + 1);
+    r = block(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -233,7 +260,30 @@ public class WmlsParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // functionName arguments
+  // functionDeclaration       |
+  //              packageStatement               |
+  //              pragmaDeclaration              |
+  //              CRLF                           |
+  //              DOC_COMMENT                    |
+  //              BLOCK_COMMENT                  |
+  //              LINE_COMMENT
+  static boolean item_(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item_")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = functionDeclaration(b, l + 1);
+    if (!r) r = packageStatement(b, l + 1);
+    if (!r) r = pragmaDeclaration(b, l + 1);
+    if (!r) r = consumeToken(b, CRLF);
+    if (!r) r = consumeToken(b, DOC_COMMENT);
+    if (!r) r = consumeToken(b, BLOCK_COMMENT);
+    if (!r) r = consumeToken(b, LINE_COMMENT);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // functionName arguments SEMICOLON
   public static boolean localFunctionCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "localFunctionCall")) return false;
     if (!nextTokenIs(b, IDENTIFIER)) return false;
@@ -241,14 +291,52 @@ public class WmlsParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = functionName(b, l + 1);
     r = r && arguments(b, l + 1);
+    r = r && consumeToken(b, SEMICOLON);
     exit_section_(b, m, LOCAL_FUNCTION_CALL, r);
     return r;
   }
 
   /* ********************************************************** */
-  // functionDeclaration
+  // package PACKAGE_IDENTIFIER SEMICOLON
+  public static boolean packageStatement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "packageStatement")) return false;
+    if (!nextTokenIs(b, PACKAGE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, PACKAGE, PACKAGE_IDENTIFIER, SEMICOLON);
+    exit_section_(b, m, PACKAGE_STATEMENT, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // use (url) IDENTIFIER STRING SEMICOLON
+  public static boolean pragmaDeclaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pragmaDeclaration")) return false;
+    if (!nextTokenIs(b, USE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, USE);
+    r = r && consumeToken(b, URL);
+    r = r && consumeTokens(b, 0, IDENTIFIER, STRING, SEMICOLON);
+    exit_section_(b, m, PRAGMA_DECLARATION, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // item_+
   static boolean wmlsFile(PsiBuilder b, int l) {
-    return functionDeclaration(b, l + 1);
+    if (!recursion_guard_(b, l, "wmlsFile")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = item_(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!item_(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "wmlsFile", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
   }
 
 }

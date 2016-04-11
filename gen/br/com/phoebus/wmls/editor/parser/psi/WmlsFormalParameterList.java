@@ -10,7 +10,7 @@ public interface WmlsFormalParameterList extends PsiElement {
   @Nullable
   WmlsFormalParameterList getFormalParameterList();
 
-  @NotNull
+  @Nullable
   PsiElement getIdentifier();
 
 }

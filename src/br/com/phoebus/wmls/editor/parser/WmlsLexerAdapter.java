@@ -10,6 +10,6 @@ import java.io.Reader;
 public class WmlsLexerAdapter extends FlexAdapter {
 
     public WmlsLexerAdapter() {
-        super(new WmlsLexer((Reader) null));
+        super(new _WmlsLexer((Reader) null));
     }
 }

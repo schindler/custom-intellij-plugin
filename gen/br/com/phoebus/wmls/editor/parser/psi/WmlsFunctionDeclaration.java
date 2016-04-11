@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface WmlsFunctionDeclaration extends PsiElement {
 
-  @NotNull
+  @Nullable
   WmlsBlock getBlock();
 
   @Nullable

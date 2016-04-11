@@ -70,19 +70,28 @@
         BITSHIFT_LEFT="<<"
         BITSHIFT_RIGHT=">>"
 
-        SPACE='regexp:\s+'
-        ID="regexp:\w+"
+        IDENTIFIER="regexp:\w+" //Check if starts with number
+        PACKAGE_IDENTIFIER="regexp:[a-zA-Z0-9#]+"
         STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
         NUMBER="regexp:\d+"
         HEX="regexp:0([xX])*([0-9a-fA-F])*"
         LINE_COMMENT="regexp://.*"
-        BLOCK_COMMENT="regexp:/\*(.|\n)*\*/"
-        DOC_COMMENT="regexp:/\**(.|\n)*\*/"
-        IDENTIFIER="regexp:$([a-zA-Z_])+(\d | \D)"
+        DOC_COMMENT="regexp:/(\*){2}(.?|\n)*\*/"
+        BLOCK_COMMENT="regexp:/(\*){1}(.?|\n)*\*/"
     ]
 }
 
-wmlsFile ::= functionDeclaration
+wmlsFile ::= item_+
+
+private item_ ::= functionDeclaration       |
+             packageStatement               |
+             pragmaDeclaration              |
+             CRLF                           |
+             DOC_COMMENT                    |
+             BLOCK_COMMENT                  |
+             LINE_COMMENT
+
+
 
 //----------------- Expressions -----------------
 //Assigment Expression
@@ -91,16 +100,16 @@ assigmentExpression ::= IDENTIFIER OP_ASSIGN IDENTIFIER
 //----------------- Functions -----------------
 //Function Declaration
 functionDeclaration ::=
-    ('extern' | 'native')? 'function' identifier LEFT_PAREN (formalParameterList)? RIGHT_PAREN block (SEMICOLON)?
+    (extern | native)? function identifier LEFT_PAREN formalParameterList? RIGHT_PAREN (block)? (SEMICOLON)?
 
-formalParameterList ::= IDENTIFIER | formalParameterList COMMA IDENTIFIER
+formalParameterList ::= IDENTIFIER | (formalParameterList COMMA IDENTIFIER)?
 
 //Local Function Call
-localFunctionCall ::= functionName arguments
+localFunctionCall ::= functionName arguments SEMICOLON
 
 functionName ::= IDENTIFIER
 
-arguments ::= LEFT_PAREN (argumentList)? RIGHT_PAREN
+arguments ::= LEFT_PAREN argumentList? RIGHT_PAREN
 
 argumentList ::= assigmentExpression | argumentList COMMA assigmentExpression
 
@@ -114,7 +123,7 @@ argumentList ::= assigmentExpression | argumentList COMMA assigmentExpression
 //Expression Statement
 
 //Block Statement
-block ::= LEFT_BRACE RIGHT_BRACE
+block ::= LEFT_BRACE (localFunctionCall)? RIGHT_BRACE
 
 //Variable Statement
 
@@ -131,3 +140,7 @@ block ::= LEFT_BRACE RIGHT_BRACE
 //Return Statement
 
 //Pragma Statement
+pragmaDeclaration ::= use (url) IDENTIFIER STRING SEMICOLON
+
+//Package Statement
+packageStatement ::= package PACKAGE_IDENTIFIER SEMICOLON

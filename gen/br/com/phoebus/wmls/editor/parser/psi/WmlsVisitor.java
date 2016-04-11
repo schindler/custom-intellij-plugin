@@ -39,6 +39,14 @@ public class WmlsVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitPackageStatement(@NotNull WmlsPackageStatement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPragmaDeclaration(@NotNull WmlsPragmaDeclaration o) {
+    visitPsiElement(o);
+  }
+
   public void visitPsiElement(@NotNull PsiElement o) {
     visitElement(o);
   }

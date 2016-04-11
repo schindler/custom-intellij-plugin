@@ -11,14 +11,14 @@ import static br.com.phoebus.wmls.editor.parser.psi.WmlsTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import br.com.phoebus.wmls.editor.parser.psi.*;
 
-public class WmlsBlockImpl extends ASTWrapperPsiElement implements WmlsBlock {
+public class WmlsPragmaDeclarationImpl extends ASTWrapperPsiElement implements WmlsPragmaDeclaration {
 
-  public WmlsBlockImpl(ASTNode node) {
+  public WmlsPragmaDeclarationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull WmlsVisitor visitor) {
-    visitor.visitBlock(this);
+    visitor.visitPragmaDeclaration(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -27,9 +27,15 @@ public class WmlsBlockImpl extends ASTWrapperPsiElement implements WmlsBlock {
   }
 
   @Override
-  @Nullable
-  public WmlsLocalFunctionCall getLocalFunctionCall() {
-    return findChildByClass(WmlsLocalFunctionCall.class);
+  @NotNull
+  public PsiElement getIdentifier() {
+    return findNotNullChildByType(IDENTIFIER);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getString() {
+    return findNotNullChildByType(STRING);
   }
 
 }

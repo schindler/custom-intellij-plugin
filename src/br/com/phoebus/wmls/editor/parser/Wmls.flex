@@ -30,5 +30,6 @@ KEY_CHARACTER=[^:=\ \n\r\t\f\\] | "\\ "
 <YYINITIAL> {
     'package'                       { return TokenType.CODE_FRAGMENT; }
     'use'                           { return TokenType.CODE_FRAGMENT; }
+    'function'                      { return TokenType.CODE_FRAGMENT; }
 }
 

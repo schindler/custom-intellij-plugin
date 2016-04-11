@@ -5,6 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface WmlsUse extends PsiElement {
+public interface WmlsPackageStatement extends PsiElement {
+
+  @NotNull
+  PsiElement getPackageIdentifier();
 
 }

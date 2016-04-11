@@ -27,9 +27,9 @@ public class WmlsFunctionDeclarationImpl extends ASTWrapperPsiElement implements
   }
 
   @Override
-  @NotNull
+  @Nullable
   public WmlsBlock getBlock() {
-    return findNotNullChildByClass(WmlsBlock.class);
+    return findChildByClass(WmlsBlock.class);
   }
 
   @Override

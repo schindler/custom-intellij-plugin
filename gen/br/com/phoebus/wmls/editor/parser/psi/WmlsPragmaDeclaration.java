@@ -5,6 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface WmlsPackage extends PsiElement {
+public interface WmlsPragmaDeclaration extends PsiElement {
+
+  @NotNull
+  PsiElement getIdentifier();
+
+  @NotNull
+  PsiElement getString();
 
 }
